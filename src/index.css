@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html {
+  background-color: #fafafa;
+}
+
+* {
+  font-family: "Outfit", system-ui, -apple-system;
+}
+
+hr {
+  @apply border-neutral-400;
+}
