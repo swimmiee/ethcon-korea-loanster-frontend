@@ -35,7 +35,6 @@ export const fetchBalancesQuery = selector<BalanceByTokenId>({
     const balancesByChain = await Promise.allSettled(
       chains.map(async (chain) => {
         tokens[chain.chainId] = tokens[chain.chainId] ?? [];
-
         const balances = await getTokenBalances(
           account,
           chain,
