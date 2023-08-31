@@ -24,10 +24,9 @@ export const usePosition = () => {
   };
 
   return {
-    position: {
-      long: position.long ? decodeTokenId(position.long) : null,
-      short: position.short ? decodeTokenId(position.short) : null,
-    },
+    long: position.long ? decodeTokenId(position.long) : null,
+    short: position.short ? decodeTokenId(position.short) : null,
+    raw: position,
     setLong,
     setShort,
   };

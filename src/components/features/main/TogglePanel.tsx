@@ -1,34 +1,24 @@
 import { cn } from "utils";
 import { Panel } from "components/materials/Panel";
-import { HTMLAttributes, useState } from "react";
+import { HTMLAttributes } from "react";
 
 interface TitledPanelProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
-  disabled?: boolean;
-  height: `h-[${number}px]`;
+  description: string
 }
 
 export const TogglePanel = ({
   title,
+  description,
   className,
   children,
-  height,
   ...props
 }: TitledPanelProps) => {
-  const [open, isOpen] = useState<boolean>(true);
-  // const toggle = () => isOpen((p) => !p);
   return (
     <Panel className={cn("p-8 flex-col", className)} {...props}>
       <p className="text-h-md font-bold">{title}</p>
-      <div
-        className={cn(
-          "duration-300 overflow-hidden",
-          open ? height : "h-0",
-          open && "pt-6"
-        )}
-      >
-        {children}
-      </div>
+      <p className="mt-1 text-t-lg text-neutral-700 font-light">{description}</p>
+      <div className="mt-4">{children}</div>
     </Panel>
   );
 };
