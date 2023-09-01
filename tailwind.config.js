@@ -18,9 +18,6 @@ export default {
       boxShadow: {
         bold: "-8px 8px 0px 0px #000000",
       },
-      borderColor: {
-        DEFAULT: "#000000",
-      },
       borderWidth: {
         1.5: "1.5px",
       },
