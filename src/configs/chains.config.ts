@@ -1,7 +1,5 @@
 import { Chain } from "interfaces/chain.interface";
 
-export const CHAIN_ID = 10;
-
 export const CHAINS:Chain[] = [
   {
     chainId: 10,

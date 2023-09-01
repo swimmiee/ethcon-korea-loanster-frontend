@@ -4,6 +4,7 @@ import { Header } from "components/layouts/header";
 import { MaxWidth } from "components/layouts/MaxWidth";
 
 export const MainPage = () => {
+
   return (
     <Background>
       <Header />
