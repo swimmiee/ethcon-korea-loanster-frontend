@@ -1,4 +1,6 @@
-export const TOKENS = {
+import { Token } from "interfaces/token.interface";
+
+export const TOKENS:{[chainId: number]:Token[]} = {
   // OP
   10: [
     {
