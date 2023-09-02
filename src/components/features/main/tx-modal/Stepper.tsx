@@ -1,5 +1,5 @@
 import { cn } from "utils";
-import { Task } from "./tx.service";
+import { Task } from "./services/tx.service";
 
 interface StepperProps {
   tasks: Task[];

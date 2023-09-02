@@ -5,6 +5,7 @@ import { getLendAndBorrowInfo } from "streams/getLendAndBorrowInfo";
 import { ERC20__factory, AAVEPool__factory } from "typechain";
 import { toFixedCond } from "utils/formatter";
 import { useGetSigner } from "utils/useGetSigner";
+import { swapAndAddLiquidityTx } from "./swapAndAddLiquidity";
 
 export interface BalanceState {
   name: string; // USDC, Deposited USDC, ...
@@ -21,6 +22,7 @@ export interface Task {
   title: string;
   description: string;
 }
+
 export const useTx = () => {
   const { hedge, amount, realLong, chain, invest, short } = usePosition();
   const [step, setStep] = useState<number>(0);
@@ -73,7 +75,7 @@ export const useTx = () => {
           depositAmount
         );
       },
-    }); // TODO: depositAmount -> depositAmount로 바꾸면 좋을 거 같습니다...
+    });
 
     // 2. deposit stable coin
     txs.push({
@@ -104,7 +106,59 @@ export const useTx = () => {
         );
       },
     });
+    // //TODO if LineaBankCore,
+    // txs.push({
+    //   title: "Deposit",
+    //   description: "Deposit to lending pool",
+    //   balanceWillbe: [
+    //     {
+    //       name: realLong!.symbol,
+    //       amount: longInputAmountFormatted,
+    //       dollarValue: +longInputAmountFormatted * realLong!.priceUSD,
+    //     },
+    //     {
+    //       name: `Deposited ${realLong!.symbol}`,
+    //       amount: depositAmountFormatted,
+    //       dollarValue: +depositAmountFormatted * realLong!.priceUSD,
+    //     },
+    //   ],
+    //   async tx(signer: Signer) {
+    //     await LineaBankCore__factory.connect(depositTo, signer).supply(
+    //       getLToken(realLong!.address),
+    //       depositAmount,
+    //       0
+    //     );
+    //   },
+    // });
 
+    // TODO:if LineaBankCore,
+    // txs.push({
+    //   title: "Enter Markets",
+    //   description: "Use to Collateral",
+    //   balanceWillbe: [
+    //     {
+    //       name: realLong!.symbol,
+    //       amount: longInputAmountFormatted,
+    //       dollarValue: +longInputAmountFormatted * realLong!.priceUSD,
+    //     },
+    //     {
+    //       name: `Deposited ${realLong!.symbol}`,
+    //       amount: depositAmountFormatted,
+    //       dollarValue: +depositAmountFormatted * realLong!.priceUSD,
+    //     },
+    //     {
+    //       name: short!.symbol,
+    //       amount: borrowAmountFormatted,
+    //       dollarValue: +borrowAmountFormatted * short!.priceUSD,
+    //     },
+    //   ],
+
+    //   async tx(signer: Signer) {
+    //     await LineaBankCore__factory.connect(depositTo, signer).enterMarkets([
+    //       realLong!.address,
+    //     ]);
+    //   },
+    // });
     // 3. borrow short token
     txs.push({
       title: "Borrow",
@@ -184,7 +238,12 @@ export const useTx = () => {
     // TODO
     // long token: `longInputAmount`
     // short token: `borrowAmount`
-    async tx(signer: Signer) {},
+    tx: swapAndAddLiquidityTx(
+      realLong!,
+      short!,
+      longInputAmount,
+      borrowAmount
+    )
   });
 
   const run = async () => {

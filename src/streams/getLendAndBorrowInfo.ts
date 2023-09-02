@@ -22,7 +22,7 @@ export const getLendAndBorrowInfo = (
   const longAmount = parseUnits(amount, long.decimals);
 
   // TODO
-  const LTV = 0.7;
+  const LTV = LENDING_CONFIG[chainId].deposit[long.symbol].ltv;
   const depositAmount =
     (longAmount * 100n * DEPOSIT_RATES[hedge]) /
     BigInt(Math.floor(10000 * (1 + LTV * BORROW_RATE)));

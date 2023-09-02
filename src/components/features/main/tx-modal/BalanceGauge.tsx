@@ -1,4 +1,4 @@
-import { BalanceState } from "./tx.service";
+import { BalanceState } from "./services/tx.service";
 
 interface BalanceGaugeProps {
   balanceWillbe: BalanceState[];

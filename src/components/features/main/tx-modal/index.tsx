@@ -1,5 +1,5 @@
 import Modal from "components/materials/Modal";
-import { useTx } from "./tx.service";
+import { useTx } from "./services/tx.service";
 import { Stepper } from "./Stepper";
 import { ImSpinner10 } from "react-icons/im";
 import { BalanceGauge } from "./BalanceGauge";
