@@ -12,9 +12,9 @@ interface DoubleHzTokensIconProps {
 export const DoubleTokensIcon = ({ tokens }: DoubleHzTokensIconProps) => {
   return (
     <div className="flex items-center">
-      <TokenIcon size="xl" token={tokens[0]} />
+      <TokenIcon size="lg" token={tokens[0]} />
       <div className="-ml-2">
-        <TokenIcon size="xl" token={tokens[1]} />
+        <TokenIcon size="lg" token={tokens[1]} />
       </div>
     </div>
   );
