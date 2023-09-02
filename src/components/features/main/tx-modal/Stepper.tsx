@@ -38,7 +38,7 @@ const Circle = ({ index, active, title, description }: CircleProps) => {
 
 export const Stepper = ({ tasks }: StepperProps) => {
   return (
-    <div className="flex flex-col py-6 justify-evenly gap-10">
+    <div className="flex flex-col px-4 py-6 justify-evenly gap-10">
       {tasks.map((t, i) => (
         <Circle key={i} index={i + 1} active {...t} />
       ))}

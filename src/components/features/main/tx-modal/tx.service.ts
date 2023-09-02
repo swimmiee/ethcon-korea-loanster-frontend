@@ -1,7 +1,7 @@
 import { Signer, formatUnits } from "ethers";
 import { useState } from "react";
 import { HEDGE, usePosition } from "states/position.state";
-import { getLendAndBorrowAmount } from "streams/getBorrowAmount";
+import { getLendAndBorrowInfo } from "streams/getLendAndBorrowInfo";
 import { ERC20__factory } from "typechain";
 import { toFixedCond } from "utils/formatter";
 import { useGetSigner } from "utils/useGetSigner";
@@ -32,9 +32,9 @@ export const useTx = () => {
     lendAmount,
     longInputAmount,
     borrowAmount,
-    lendingPool,
+    depositTo,
     lendingProtocol,
-  } = getLendAndBorrowAmount(realLong!, short!, amount, hedge);
+  } = getLendAndBorrowInfo(realLong!, short!, amount, hedge);
 
   const longInputAmountFormatted = toFixedCond(
     formatUnits(longInputAmount, realLong?.decimals)
@@ -46,24 +46,11 @@ export const useTx = () => {
     formatUnits(borrowAmount, short?.decimals)
   );
 
-  // const initBalances = [
-  //   {
-  //     name: realLong!.symbol,
-  //     amount,
-  //     dollarValue:
-  //       +formatUnits(amount, realLong!.decimals) * realLong!.priceUSD,
-  //   },
-  // ];
   const initBalances = [
     {
       name: realLong!.symbol,
-      amount: longInputAmountFormatted,
-      dollarValue: +longInputAmountFormatted * realLong!.priceUSD,
-    },
-    {
-      name: `Deposited ${realLong!.symbol}`,
-      amount: lendAmountFormatted,
-      dollarValue: +lendAmountFormatted * realLong!.priceUSD,
+      amount,
+      dollarValue: +amount * realLong!.priceUSD,
     },
   ];
 
@@ -82,7 +69,7 @@ export const useTx = () => {
       balanceWillbe: initBalances,
       async tx(signer: Signer) {
         await ERC20__factory.connect(realLong!.address, signer).approve(
-          lendingPool,
+          depositTo,
           lendAmount
         );
       },
@@ -104,6 +91,10 @@ export const useTx = () => {
           dollarValue: +lendAmountFormatted * realLong!.priceUSD,
         },
       ],
+      // TODO: DEPOSIT
+      // use this:
+      // `depositTo` -> lending pool 주소
+      // `lendAmount` -> lending amount(bigint)
       async tx(signer: Signer) {},
     });
 
@@ -123,18 +114,22 @@ export const useTx = () => {
           dollarValue: +lendAmountFormatted * realLong!.priceUSD,
         },
         {
-          name: `Borrowed ${short!.symbol}`,
+          name: short!.symbol,
           amount: borrowAmountFormatted,
           dollarValue: +borrowAmountFormatted * short!.priceUSD,
         },
       ],
+      // TODO: BORROW
+      // use this:
+      // `borrowFrom` -> 빌리는 곳 주소
+      // `borrowAmount` -> borrow amount(bigint)
       async tx(signer: Signer) {},
     });
   }
 
   tasks.push({
     title: "Invest in UniswapV3",
-    description: `${longInputAmountFormatted} ${realLong?.symbol} + ${borrowAmountFormatted} ${short?.symbol}`,
+    description: `Add ${longInputAmountFormatted} ${realLong?.symbol} + ${borrowAmountFormatted} ${short?.symbol}`,
   });
 
   // 4. approve long token to toaster contract
@@ -169,8 +164,11 @@ export const useTx = () => {
   txs.push({
     title: "Provide Liquidity",
     description: "Provide liquidity to the pool",
-    // TODO
+    // TODO amount prediction
     balanceWillbe: txs[txs.length - 1].balanceWillbe,
+    // TODO
+    // long token: `longInputAmount`
+    // short token: `borrowAmount`
     async tx(signer: Signer) {},
   });
 
