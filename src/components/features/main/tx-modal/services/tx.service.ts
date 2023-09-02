@@ -57,7 +57,9 @@ export const useTx = () => {
     formatUnits(protocol ? protocol.borrowAmount : 0, short?.decimals)
   );
 
-  const initBalances = toBalanceState([[realLong!, longInputAmount]]);
+  const initBalances = toBalanceState([
+    [realLong!, parseUnits(amount, realLong?.decimals)],
+  ]);
 
   if (hedge !== HEDGE.NO_HEDGE && protocol) {
     const {
@@ -106,9 +108,9 @@ export const useTx = () => {
         description: "Use to Collateral",
         balanceWillbe: txs[txs.length - 1].balanceWillbe,
         async tx(signer: Signer) {
-          await LineaBankCore__factory.connect(depositTo, signer).enterMarkets([
-            realLong!.address,
-          ]);
+          await LineaBankCore__factory.connect(depositTo, signer)
+            .enterMarkets([realLong!.address])
+            .then((tx) => tx.wait());
         },
       });
     }
@@ -156,15 +158,12 @@ export const useTx = () => {
     });
   }
   // 6. toast
-  const lastBalanceState:  [Token, bigint][] = [
+  const lastBalanceState: [Token, bigint][] = [
     [realLong!, longInputAmount - swapLongInput],
     [short!, swapShortInput],
   ];
   if (hedge !== HEDGE.NO_HEDGE && protocol) {
-    lastBalanceState.push([
-      realLong!,
-      protocol.depositAmount,
-    ]);
+    lastBalanceState.push([realLong!, protocol.depositAmount]);
   }
   txs.push({
     title: "Provide Liquidity",

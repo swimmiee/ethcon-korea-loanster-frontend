@@ -18,14 +18,14 @@ export const deposit = (
         amount,
         await signer.getAddress(),
         0
-      );
+      ).then((tx) => tx.wait());
     }
     if (lendingProtocol === "LineaBank") {
       const { lToken } = meta as LendingMeta<"LineaBank">;
       await LineaBankCore__factory.connect(depositTo, signer).supply(
         lToken[token.symbol],
         amount
-      );
+      ).then((tx) => tx.wait());
     }
   };
 };

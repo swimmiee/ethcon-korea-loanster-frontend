@@ -7,6 +7,6 @@ export const approve = (token: Token, spender: string, amount: bigint) => {
     await ERC20__factory.connect(token.address, signer).approve(
       spender,
       amount
-    );
+    ).then((tx) => tx.wait());
   };
 };

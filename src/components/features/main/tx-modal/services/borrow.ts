@@ -18,7 +18,7 @@ export const borrow = (
       await LineaBankCore__factory.connect(borrowFrom, signer).borrow(
         lToken[token.symbol],
         amount
-      );
+      ).then((tx) => tx.wait());
     } else {
       console.log({
         address: token.address,
@@ -31,7 +31,7 @@ export const borrow = (
         2,
         0,
         userAddress
-      );
+      ).then((tx) => tx.wait());
     }
   };
 };

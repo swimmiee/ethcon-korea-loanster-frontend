@@ -98,13 +98,16 @@ export const swapAndAddLiquidityTx = (
           ])
     );
 
-    await toaster.connect(signer)["multicall(bytes[])"](multicallData, {
-      value:
-        long.type === "NATIVE"
-          ? amtLong
-          : short.type === "NATIVE"
-          ? amtShort
-          : 0,
-    });
+    await toaster
+      .connect(signer)
+      ["multicall(bytes[])"](multicallData, {
+        value:
+          long.type === "NATIVE"
+            ? amtLong
+            : short.type === "NATIVE"
+            ? amtShort
+            : 0,
+      })
+      .then((tx) => tx.wait());
   };
 };

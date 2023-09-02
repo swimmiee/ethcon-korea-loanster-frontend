@@ -23,16 +23,16 @@ export const getLendAndBorrowInfo = (
   const protocol = findLendingProtocol(long, short);
   if (!protocol) return null;
 
-  // TODO
   const LTV = protocol.depositToken.ltv;
   // $deposit = $totalAmount / (1 + LTV * BORROW_RATE)
   const depositAmount =
-    (longAmount * 100n * DEPOSIT_RATES[hedge]) /
-    BigInt(Math.floor(10000 * (1 + LTV * BORROW_RATE)));
+    (longAmount * 1000n * DEPOSIT_RATES[hedge]) /
+    BigInt(Math.floor(100000 * (1 + LTV * BORROW_RATE)));
 
   // $borrow = $deposit * (LTV * BORROW_RATE)
   const _borrowAmount =
-    (((depositAmount * BigInt(10000 * (LTV * BORROW_RATE))) / 10000n) *
+    (((depositAmount * BigInt(Math.floor(100000 * (LTV * BORROW_RATE)))) /
+      100000n) *
       BigInt(Math.floor((100000 * long.priceUSD) / short.priceUSD))) /
     100000n;
 
