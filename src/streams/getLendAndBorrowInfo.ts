@@ -4,12 +4,12 @@ import { HEDGE } from "states/position.state";
 import { findLendingProtocol } from "./findLendingProtocol";
 
 // User borrows ltv * BORROW_RATE
-const BORROW_RATE = 0.67;
-const DEPOSIT_RATES = {
+export const BORROW_RATE = 0.67;
+export const DEPOSIT_RATES = {
   [HEDGE.NO_HEDGE]: 0n,
-  [HEDGE.STANDARD]: 30n,
-  [HEDGE.STRONG]: 70n,
-  [HEDGE.NEUTRAL]: 100n,
+  [HEDGE.STANDARD]: 20n,
+  [HEDGE.MILD]: 40n,
+  [HEDGE.FULL]: 100n,
 };
 
 export const getLendAndBorrowInfo = (

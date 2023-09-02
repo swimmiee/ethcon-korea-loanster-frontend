@@ -11,8 +11,8 @@ export enum RANGE {
 export enum HEDGE {
   NO_HEDGE = 0,
   STANDARD = 1,
-  STRONG = 2,
-  NEUTRAL = 3,
+  MILD = 2,
+  FULL = 3,
 }
 interface PositionState {
   chainId: number;

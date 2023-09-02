@@ -1,10 +1,9 @@
 import { findTokens } from "configs";
 import { usePosition } from "states/position.state";
-import { getAddress } from "ethers";
 import { InvestDto } from "interfaces/invest.dto";
-import INVEST_LIST from "configs/invests.data.json";
 import { Token } from "interfaces/token.interface";
 import { findLendingProtocol } from "streams/findLendingProtocol";
+import INVEST_LIST from "configs/invests.data.json";
 
 export const usePools = () => {
   const { invest, chain, long, setInvest } = usePosition();

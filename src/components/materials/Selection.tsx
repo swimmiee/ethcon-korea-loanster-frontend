@@ -12,11 +12,11 @@ interface SelectionProps<T, ID> {
 
 export const Selection = <T extends {}, ID>({
   selected,
-  setSelected,
   cols,
   items,
-  getId,
   Item,
+  getId,
+  setSelected,
 }: SelectionProps<T, ID>) => {
   return (
     <div
