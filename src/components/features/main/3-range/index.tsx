@@ -1,6 +1,7 @@
 import { HEDGE, RANGE, usePosition } from "states/position.state";
 import { Selection } from "components/materials/Selection";
 import { findLendingProtocol } from "streams/findLendingProtocol";
+import { RangeGraph } from "./RangeGraph";
 
 interface RItem<T extends RANGE | HEDGE> {
   id: T;
@@ -27,6 +28,7 @@ export const RangeSelection = () => {
   return (
     <div>
       <p className="text-t-lg mb-2">Select pooled range</p>
+      <RangeGraph range={poolRange} />
       <Selection
         selected={poolRange}
         setSelected={(r) => setPoolRange(r.id)}

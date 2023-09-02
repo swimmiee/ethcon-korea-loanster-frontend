@@ -15,7 +15,7 @@ export const Main = () => {
       <TogglePanel title="1. Input stablecoin">
         <InputStablecoin />
       </TogglePanel>
-      <TogglePanel title="2. Pool">
+      <TogglePanel title="2. Pair">
         <Pools />
       </TogglePanel>
       <TogglePanel title="3. Range">

@@ -3,6 +3,7 @@ import { findTokens } from "configs";
 import { InvestDto } from "interfaces/invest.dto";
 import { findLendingProtocol } from "streams/findLendingProtocol";
 import { compactFormat } from "utils/formatter";
+import { isHedgeable } from "./pools.service";
 
 export const PoolItem = ({
   chainId,
@@ -13,10 +14,7 @@ export const PoolItem = ({
   meta,
 }: InvestDto) => {
   const tokens = findTokens(chainId, inputAssets, true);
-  const hedgeable = Boolean(
-    findLendingProtocol(tokens[0], tokens[1]) ??
-      findLendingProtocol(tokens[1], tokens[0])
-  );
+  const hedgeable = isHedgeable(tokens);
   return (
     <div className="flex flex-col flex-1 px-2 py-1">
       <div className="flex items-center gap-2 -mx-1 justify-between">

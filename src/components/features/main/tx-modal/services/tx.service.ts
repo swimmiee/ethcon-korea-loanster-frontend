@@ -77,7 +77,7 @@ export const useTx = () => {
       title: "Approve",
       description: `Approve ${depositAmountFormatted} ${
         realLong!.symbol
-      } for lending pool`,
+      } for ${lendingProtocol}`,
       balanceWillbe: initBalances,
       tx: approve(realLong!, depositTo, depositAmount),
     });
@@ -85,7 +85,7 @@ export const useTx = () => {
     // 2. deposit stable coin
     txs.push({
       title: "Deposit",
-      description: "Deposit to lending pool",
+      description: `Deposit to ${lendingProtocol}`,
       balanceWillbe: toBalanceState([
         [realLong!, longInputAmount],
         [realLong!, depositAmount],
@@ -116,7 +116,7 @@ export const useTx = () => {
     // 3. borrow short token
     txs.push({
       title: "Borrow",
-      description: "Borrow from lending pool",
+      description: `Borrow from ${lendingProtocol}`,
       balanceWillbe: toBalanceState([
         [realLong!, longInputAmount],
         [short!, borrowAmount],
@@ -168,7 +168,7 @@ export const useTx = () => {
   }
   txs.push({
     title: "Provide Liquidity",
-    description: "Provide liquidity to the pool",
+    description: `Provide liquidity to the ${invest!.project}`,
     // TODO amount prediction
     balanceWillbe: toBalanceState(lastBalanceState),
     async predict() {

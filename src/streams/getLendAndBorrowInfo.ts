@@ -1,4 +1,3 @@
-import { LENDING_CONFIG } from "configs/lending.config";
 import { parseUnits } from "ethers";
 import { Token } from "interfaces/token.interface";
 import { HEDGE } from "states/position.state";
