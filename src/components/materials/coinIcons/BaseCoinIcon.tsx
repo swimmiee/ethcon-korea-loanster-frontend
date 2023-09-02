@@ -40,7 +40,7 @@ export const BaseCoinIcon = ({
       src={imgSrc}
       alt={alt}
       className={cn(
-        "rounded-full border bg-white",
+        "rounded-full border bg-white border-black",
         mobileIconSizeOf[mobileSize],
         iconSizeOf[size],
         className

@@ -21,7 +21,7 @@ export const Selection = <T extends {}, ID>({
   return (
     <div
       className={cn(
-        "grid border-[0.5px] border-neutral-200",
+        "grid border-[0.5px] border-black",
         cols === 2
           ? "grid-cols-2"
           : cols === 3
@@ -39,9 +39,9 @@ export const Selection = <T extends {}, ID>({
             key={i}
             className={cn(
               selected === id
-                ? "bg-white border"
-                : "bg-neutral-100 hover:bg-[#FAFAFA]",
-              "border-[0.5px] border-neutral-200 p-3 flex gap-3 items-center"
+                ? "bg-primary-300 border"
+                : "bg-neutral-50 hover:bg-neutral-200",
+              "border-[0.5px] border-black p-3 flex gap-3 items-center"
             )}
           >
             <Item {...item} />

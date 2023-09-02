@@ -15,6 +15,7 @@ export interface InvestDto {
     tickSpacing: number;
     toaster: string;
     swapRouter: string;
+    positionManager: string;
     factory: string;
     masterChef?: string;
     rewardToken?: string;

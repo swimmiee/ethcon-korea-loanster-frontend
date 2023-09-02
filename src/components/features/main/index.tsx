@@ -12,16 +12,16 @@ export const Main = () => {
   const { isValid, invest, amount } = usePosition();
   return (
     <div className="mt-4 flex flex-col gap-8 mb-40">
-      <TogglePanel title="1️⃣ Input stablecoin">
+      <TogglePanel title="1. Input stablecoin">
         <InputStablecoin />
       </TogglePanel>
-      <TogglePanel title="2️⃣ Pool">
+      <TogglePanel title="2. Pool">
         <Pools />
       </TogglePanel>
-      <TogglePanel title="3️⃣ Range">
+      <TogglePanel title="3. Range">
         <RangeSelection />
       </TogglePanel>
-      <TogglePanel title="4️⃣ Amount">
+      <TogglePanel title="4. Amount">
         <Amount />
       </TogglePanel>
 

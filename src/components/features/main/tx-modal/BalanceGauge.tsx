@@ -16,8 +16,8 @@ export const BalanceGauge = ({ balanceWillbe }: BalanceGaugeProps) => {
           key={i}
           className="h-full flex flex-col items-center justify-center"
           style={{
-            background: ["#ffb700", "#00ff99","#00b7ff"][i],
-            flex: b.dollarValue / nextTotalBalance,
+            background: ["#ffb700", "#aaff00","#00d0ff"][i],
+            flex: nextTotalBalance > 0 ? b.dollarValue / nextTotalBalance : 1,
           }}
         >
           <p className="text-b-md -mb-[3px] font-bold">

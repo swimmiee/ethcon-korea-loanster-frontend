@@ -1,5 +1,6 @@
 import { HEDGE, RANGE, usePosition } from "states/position.state";
 import { Selection } from "components/materials/Selection";
+import { findLendingProtocol } from "streams/findLendingProtocol";
 
 interface RItem<T extends RANGE | HEDGE> {
   id: T;
@@ -18,7 +19,10 @@ const hedgePowerItems: RItem<HEDGE>[] = [
 ];
 
 export const RangeSelection = () => {
-  const { poolRange, hedge, invest, setPoolRange, setHedge } = usePosition();
+  const { realLong, short, poolRange, hedge, invest, setPoolRange, setHedge } =
+    usePosition();
+  const lendingProtocol =
+    realLong && short ? findLendingProtocol(realLong, short) : undefined;
 
   return (
     <div>
@@ -36,18 +40,26 @@ export const RangeSelection = () => {
         )}
       />
       <p className="text-t-lg mt-4 mb-2">Select hedging power</p>
-      <Selection
-        selected={hedge}
-        setSelected={(r) => setHedge(r.id)}
-        items={hedgePowerItems}
-        getId={(i) => i.id}
-        cols={4}
-        Item={(item) => (
-          <div className="flex-1">
-            <p className="text-h-sm text-center">{item.name}</p>
-          </div>
-        )}
-      />
+      {lendingProtocol ? (
+        <Selection
+          selected={hedge}
+          setSelected={(r) => setHedge(r.id)}
+          items={hedgePowerItems}
+          getId={(i) => i.id}
+          cols={4}
+          Item={(item) => (
+            <div className="flex-1">
+              <p className="text-h-sm text-center">{item.name}</p>
+            </div>
+          )}
+        />
+      ) : (
+        <div className="flex border border-neutral-400 bg-neutral-100 h-[49px] items-center justify-center">
+          <p className="text-t-xl text-neutral-500">
+            {lendingProtocol === null ? "Hedge unavailable" : "Select pool first"}
+          </p>
+        </div>
+      )}
 
       <div className="mt-6 flex justify-center gap-2">
         <p className="text-h-sm text-center"> Expected APR: </p>

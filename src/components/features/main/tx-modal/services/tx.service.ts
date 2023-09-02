@@ -1,11 +1,18 @@
-import { Signer, formatUnits } from "ethers";
+import { Signer, formatUnits, parseUnits } from "ethers";
 import { useState } from "react";
 import { HEDGE, usePosition } from "states/position.state";
 import { getLendAndBorrowInfo } from "streams/getLendAndBorrowInfo";
-import { ERC20__factory, AAVEPool__factory } from "typechain";
+import { LineaBankCore__factory } from "typechain";
 import { toFixedCond } from "utils/formatter";
 import { useGetSigner } from "utils/useGetSigner";
 import { swapAndAddLiquidityTx } from "./swapAndAddLiquidity";
+import { toBalanceState } from "./balanceState";
+import { deposit } from "./deposit";
+import { approve } from "./approve";
+import { borrow } from "./borrow";
+import { predictInvestUniswapV3 } from "./predictInvestUniswapV3";
+import { getProvider } from "utils/getProvider";
+import { Token } from "interfaces/token.interface";
 
 export interface BalanceState {
   name: string; // USDC, Deposited USDC, ...
@@ -16,6 +23,7 @@ interface Tx {
   title: string;
   description: string;
   balanceWillbe: BalanceState[];
+  predict?: () => Promise<void>;
   tx: (signer: Signer) => Promise<void>;
 }
 export interface Task {
@@ -24,39 +32,41 @@ export interface Task {
 }
 
 export const useTx = () => {
-  const { hedge, amount, realLong, chain, invest, short } = usePosition();
+  const { hedge, amount, realLong, chain, invest, short, poolRange } =
+    usePosition();
   const [step, setStep] = useState<number>(0);
   const getSigner = useGetSigner();
   const txs: Tx[] = [];
   const tasks: Task[] = []; // just for display
 
-  const {
-    depositAmount,
-    longInputAmount,
-    borrowAmount,
-    depositTo,
-    lendingProtocol,
-  } = getLendAndBorrowInfo(realLong!, short!, amount, hedge);
+  const protocol = getLendAndBorrowInfo(realLong!, short!, amount, hedge);
+  const longInputAmount = protocol
+    ? protocol.longInputAmount
+    : parseUnits(amount, realLong?.decimals);
 
   const longInputAmountFormatted = toFixedCond(
     formatUnits(longInputAmount, realLong?.decimals)
   );
+  const [swapLongInput, setSwapLongInput] = useState<bigint>(longInputAmount);
+  const [swapShortInput, setSwapShortInput] = useState<bigint>(0n);
+
   const depositAmountFormatted = toFixedCond(
-    formatUnits(depositAmount, realLong?.decimals)
+    formatUnits(protocol ? protocol.depositAmount : 0, realLong?.decimals)
   );
   const borrowAmountFormatted = toFixedCond(
-    formatUnits(borrowAmount, short?.decimals)
+    formatUnits(protocol ? protocol.borrowAmount : 0, short?.decimals)
   );
 
-  const initBalances = [
-    {
-      name: realLong!.symbol,
-      amount,
-      dollarValue: +amount * realLong!.priceUSD,
-    },
-  ];
+  const initBalances = toBalanceState([[realLong!, longInputAmount]]);
 
-  if (hedge !== HEDGE.NO_HEDGE) {
+  if (hedge !== HEDGE.NO_HEDGE && protocol) {
+    const {
+      lendingProtocol,
+      depositTo,
+      depositAmount,
+      borrowAmount,
+      borrowFrom,
+    } = protocol;
     tasks.push({
       title: `Hedge with ${lendingProtocol}`,
       description: `Deposit ${depositAmountFormatted} ${realLong?.symbol} → Lend ${borrowAmountFormatted} ${short?.symbol}`,
@@ -69,130 +79,56 @@ export const useTx = () => {
         realLong!.symbol
       } for lending pool`,
       balanceWillbe: initBalances,
-      async tx(signer: Signer) {
-        await ERC20__factory.connect(realLong!.address, signer).approve(
-          depositTo,
-          depositAmount
-        );
-      },
+      tx: approve(realLong!, depositTo, depositAmount),
     });
 
     // 2. deposit stable coin
     txs.push({
       title: "Deposit",
       description: "Deposit to lending pool",
-      balanceWillbe: [
-        {
-          name: realLong!.symbol,
-          amount: longInputAmountFormatted,
-          dollarValue: +longInputAmountFormatted * realLong!.priceUSD,
-        },
-        {
-          name: `Deposited ${realLong!.symbol}`,
-          amount: depositAmountFormatted,
-          dollarValue: +depositAmountFormatted * realLong!.priceUSD,
-        },
-      ],
-      // TODO: DEPOSIT
-      // use this:
-      // `depositTo` -> lending pool 주소
-      // `depositAmount` -> lending amount(bigint)
-      async tx(signer: Signer) {
-        await AAVEPool__factory.connect(depositTo, signer).deposit(
-          realLong!.address,
-          depositAmount,
-          await signer.getAddress(),
-          0
-        );
-      },
+      balanceWillbe: toBalanceState([
+        [realLong!, longInputAmount],
+        [realLong!, depositAmount],
+      ]),
+      tx: deposit(
+        realLong!,
+        depositAmount,
+        depositTo,
+        lendingProtocol,
+        protocol.meta
+      ),
     });
-    // //TODO if LineaBankCore,
-    // txs.push({
-    //   title: "Deposit",
-    //   description: "Deposit to lending pool",
-    //   balanceWillbe: [
-    //     {
-    //       name: realLong!.symbol,
-    //       amount: longInputAmountFormatted,
-    //       dollarValue: +longInputAmountFormatted * realLong!.priceUSD,
-    //     },
-    //     {
-    //       name: `Deposited ${realLong!.symbol}`,
-    //       amount: depositAmountFormatted,
-    //       dollarValue: +depositAmountFormatted * realLong!.priceUSD,
-    //     },
-    //   ],
-    //   async tx(signer: Signer) {
-    //     await LineaBankCore__factory.connect(depositTo, signer).supply(
-    //       getLToken(realLong!.address),
-    //       depositAmount,
-    //       0
-    //     );
-    //   },
-    // });
 
-    // TODO:if LineaBankCore,
-    // txs.push({
-    //   title: "Enter Markets",
-    //   description: "Use to Collateral",
-    //   balanceWillbe: [
-    //     {
-    //       name: realLong!.symbol,
-    //       amount: longInputAmountFormatted,
-    //       dollarValue: +longInputAmountFormatted * realLong!.priceUSD,
-    //     },
-    //     {
-    //       name: `Deposited ${realLong!.symbol}`,
-    //       amount: depositAmountFormatted,
-    //       dollarValue: +depositAmountFormatted * realLong!.priceUSD,
-    //     },
-    //     {
-    //       name: short!.symbol,
-    //       amount: borrowAmountFormatted,
-    //       dollarValue: +borrowAmountFormatted * short!.priceUSD,
-    //     },
-    //   ],
+    // 2-1. lineabank의 경우 enter market 추가
+    if (lendingProtocol === "LineaBank") {
+      txs.push({
+        title: "Enter Markets",
+        description: "Use to Collateral",
+        balanceWillbe: txs[txs.length - 1].balanceWillbe,
+        async tx(signer: Signer) {
+          await LineaBankCore__factory.connect(depositTo, signer).enterMarkets([
+            realLong!.address,
+          ]);
+        },
+      });
+    }
 
-    //   async tx(signer: Signer) {
-    //     await LineaBankCore__factory.connect(depositTo, signer).enterMarkets([
-    //       realLong!.address,
-    //     ]);
-    //   },
-    // });
     // 3. borrow short token
     txs.push({
       title: "Borrow",
       description: "Borrow from lending pool",
-      balanceWillbe: [
-        {
-          name: realLong!.symbol,
-          amount: longInputAmountFormatted,
-          dollarValue: +longInputAmountFormatted * realLong!.priceUSD,
-        },
-        {
-          name: `Deposited ${realLong!.symbol}`,
-          amount: depositAmountFormatted,
-          dollarValue: +depositAmountFormatted * realLong!.priceUSD,
-        },
-        {
-          name: short!.symbol,
-          amount: borrowAmountFormatted,
-          dollarValue: +borrowAmountFormatted * short!.priceUSD,
-        },
-      ],
-      // TODO: BORROW
-      // use this:
-      // `borrowFrom` -> 빌리는 곳 주소
-      // `borrowAmount` -> borrow amount(bigint)
-      async tx(signer: Signer) {
-        await AAVEPool__factory.connect(depositTo, signer).borrow(
-          realLong!.address,
-          borrowAmount,
-          1,
-          0,
-          await signer.getAddress()
-        );
-      },
+      balanceWillbe: toBalanceState([
+        [realLong!, longInputAmount],
+        [short!, borrowAmount],
+        [realLong!, depositAmount],
+      ]),
+      tx: borrow(
+        short!,
+        borrowAmount,
+        borrowFrom,
+        lendingProtocol,
+        protocol.meta
+      ),
     });
   }
 
@@ -207,43 +143,57 @@ export const useTx = () => {
     description: "Approve for Toaster",
     balanceWillbe:
       txs.length === 0 ? initBalances : txs[txs.length - 1].balanceWillbe,
-    async tx(signer: Signer) {
-      await ERC20__factory.connect(realLong!.address, signer).approve(
-        invest!.meta.toaster,
-        longInputAmount
-      );
-    },
+    tx: approve(realLong!, invest!.meta.toaster, longInputAmount),
   });
 
   // 5. approve short token to toaster
-  if (hedge !== HEDGE.NO_HEDGE) {
+  if (hedge !== HEDGE.NO_HEDGE && protocol) {
     txs.push({
       title: "Approve",
       description: "Approve for Toaster",
       balanceWillbe: txs[txs.length - 1].balanceWillbe,
-      async tx(signer: Signer) {
-        await ERC20__factory.connect(short!.address, signer).approve(
-          invest!.meta.toaster,
-          borrowAmount
-        );
-      },
+      tx: approve(short!, invest!.meta.toaster, protocol.borrowAmount),
     });
   }
   // 6. toast
+  const lastBalanceState:  [Token, bigint][] = [
+    [realLong!, longInputAmount - swapLongInput],
+    [short!, swapShortInput],
+  ];
+  if (hedge !== HEDGE.NO_HEDGE && protocol) {
+    lastBalanceState.push([
+      realLong!,
+      protocol.depositAmount,
+    ]);
+  }
   txs.push({
     title: "Provide Liquidity",
     description: "Provide liquidity to the pool",
     // TODO amount prediction
-    balanceWillbe: txs[txs.length - 1].balanceWillbe,
-    // TODO
-    // long token: `longInputAmount`
-    // short token: `borrowAmount`
+    balanceWillbe: toBalanceState(lastBalanceState),
+    async predict() {
+      await predictInvestUniswapV3(
+        getProvider(chain),
+        realLong!,
+        short!,
+        longInputAmount,
+        protocol ? protocol.borrowAmount : 0n,
+        poolRange,
+        invest!,
+        setSwapLongInput,
+        setSwapShortInput
+      );
+    },
     tx: swapAndAddLiquidityTx(
       realLong!,
       short!,
       longInputAmount,
-      borrowAmount
-    )
+      protocol ? protocol.borrowAmount : 0n,
+      poolRange,
+      invest!,
+      setSwapLongInput,
+      setSwapShortInput
+    ),
   });
 
   const run = async () => {
@@ -260,5 +210,6 @@ export const useTx = () => {
     txs,
     tasks,
     run,
+    initBalances,
   };
 };

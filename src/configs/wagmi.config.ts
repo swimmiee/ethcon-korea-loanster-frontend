@@ -3,13 +3,22 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 // @ts-ignore
 import { getDefaultConfig } from "connectkit";
-import { arbitrum, mainnet, optimism, polygon } from "wagmi/chains";
+import {
+  arbitrum,
+  linea,
+  mainnet,
+  optimism,
+  polygon,
+  polygonZkEvm,
+} from "wagmi/chains";
 
 const SUPPORTED_CHAINS = [
   mainnet,
   polygon,
   optimism,
   arbitrum,
+  polygonZkEvm,
+  linea,
 ];
 const { chains } = configureChains(SUPPORTED_CHAINS, [
   alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_ID }),

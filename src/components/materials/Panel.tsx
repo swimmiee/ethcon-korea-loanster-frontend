@@ -7,7 +7,7 @@ export const Panel = ({
 }: HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
-      className={cn("flex bg-white border-1.5 rounded-2xl", className)}
+      className={cn("flex bg-white border-1.5", className)}
       {...props}
     />
   );
