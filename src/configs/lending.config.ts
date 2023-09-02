@@ -74,4 +74,5 @@ export const LENDING_CONFIG: Record<number, LendingConfig<any>[]> = {
       },
     },
   ] as LendingConfig<"LineaBank">[],
+  
 };

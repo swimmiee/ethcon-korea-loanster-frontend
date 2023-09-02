@@ -4,7 +4,7 @@ import { Token } from "interfaces/token.interface";
 export const findLendingProtocol = (long: Token, short: Token) => {
   const chainId = long.chainId;
 
-  if(!LENDING_CONFIG[chainId]) return null;
+  if (!LENDING_CONFIG[chainId]) return null;
   const protocol = LENDING_CONFIG[chainId].find(
     (config) =>
       config.borrowToken.includes(short.symbol) &&
