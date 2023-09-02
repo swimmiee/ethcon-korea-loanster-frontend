@@ -23,12 +23,12 @@ export const getLendAndBorrowInfo = (
 
   // TODO
   const LTV = 0.7;
-  const lendAmount =
+  const depositAmount =
     (longAmount * 100n * DEPOSIT_RATES[hedge]) /
     BigInt(Math.floor(10000 * (1 + LTV * BORROW_RATE)));
 
   const _borrowAmount =
-    (((lendAmount * BigInt(10000 * (LTV * BORROW_RATE))) / 10000n) *
+    (((depositAmount * BigInt(10000 * (LTV * BORROW_RATE))) / 10000n) *
       BigInt(Math.floor((1000000 * long.priceUSD) / short.priceUSD))) /
     100000n;
   const borrowAmount =
@@ -43,8 +43,8 @@ export const getLendAndBorrowInfo = (
     depositTo: lend?.depositTo ?? "",
     borrowFrom: borrow?.borrowFrom ?? "",
     lendingProtocol: lend?.name ?? "",
-    lendAmount,
-    longInputAmount: longAmount - lendAmount,
+    depositAmount,
+    longInputAmount: longAmount - depositAmount,
     borrowAmount,
   };
 };

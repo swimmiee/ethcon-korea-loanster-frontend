@@ -2,7 +2,7 @@ import { Signer, formatUnits } from "ethers";
 import { useState } from "react";
 import { HEDGE, usePosition } from "states/position.state";
 import { getLendAndBorrowInfo } from "streams/getLendAndBorrowInfo";
-import { ERC20__factory } from "typechain";
+import { ERC20__factory, AAVEPool__factory } from "typechain";
 import { toFixedCond } from "utils/formatter";
 import { useGetSigner } from "utils/useGetSigner";
 
@@ -29,7 +29,7 @@ export const useTx = () => {
   const tasks: Task[] = []; // just for display
 
   const {
-    lendAmount,
+    depositAmount,
     longInputAmount,
     borrowAmount,
     depositTo,
@@ -39,8 +39,8 @@ export const useTx = () => {
   const longInputAmountFormatted = toFixedCond(
     formatUnits(longInputAmount, realLong?.decimals)
   );
-  const lendAmountFormatted = toFixedCond(
-    formatUnits(lendAmount, realLong?.decimals)
+  const depositAmountFormatted = toFixedCond(
+    formatUnits(depositAmount, realLong?.decimals)
   );
   const borrowAmountFormatted = toFixedCond(
     formatUnits(borrowAmount, short?.decimals)
@@ -57,23 +57,23 @@ export const useTx = () => {
   if (hedge !== HEDGE.NO_HEDGE) {
     tasks.push({
       title: `Hedge with ${lendingProtocol}`,
-      description: `Deposit ${lendAmountFormatted} ${realLong?.symbol} → Lend ${borrowAmountFormatted} ${short?.symbol}`,
+      description: `Deposit ${depositAmountFormatted} ${realLong?.symbol} → Lend ${borrowAmountFormatted} ${short?.symbol}`,
     });
 
     // 1. approve to lending pool
     txs.push({
       title: "Approve",
-      description: `Approve ${lendAmountFormatted} ${
+      description: `Approve ${depositAmountFormatted} ${
         realLong!.symbol
       } for lending pool`,
       balanceWillbe: initBalances,
       async tx(signer: Signer) {
         await ERC20__factory.connect(realLong!.address, signer).approve(
           depositTo,
-          lendAmount
+          depositAmount
         );
       },
-    });
+    }); // TODO: depositAmount -> depositAmount로 바꾸면 좋을 거 같습니다...
 
     // 2. deposit stable coin
     txs.push({
@@ -87,15 +87,22 @@ export const useTx = () => {
         },
         {
           name: `Deposited ${realLong!.symbol}`,
-          amount: lendAmountFormatted,
-          dollarValue: +lendAmountFormatted * realLong!.priceUSD,
+          amount: depositAmountFormatted,
+          dollarValue: +depositAmountFormatted * realLong!.priceUSD,
         },
       ],
       // TODO: DEPOSIT
       // use this:
       // `depositTo` -> lending pool 주소
-      // `lendAmount` -> lending amount(bigint)
-      async tx(signer: Signer) {},
+      // `depositAmount` -> lending amount(bigint)
+      async tx(signer: Signer) {
+        await AAVEPool__factory.connect(depositTo, signer).deposit(
+          realLong!.address,
+          depositAmount,
+          await signer.getAddress(),
+          0
+        );
+      },
     });
 
     // 3. borrow short token
@@ -110,8 +117,8 @@ export const useTx = () => {
         },
         {
           name: `Deposited ${realLong!.symbol}`,
-          amount: lendAmountFormatted,
-          dollarValue: +lendAmountFormatted * realLong!.priceUSD,
+          amount: depositAmountFormatted,
+          dollarValue: +depositAmountFormatted * realLong!.priceUSD,
         },
         {
           name: short!.symbol,
@@ -123,7 +130,15 @@ export const useTx = () => {
       // use this:
       // `borrowFrom` -> 빌리는 곳 주소
       // `borrowAmount` -> borrow amount(bigint)
-      async tx(signer: Signer) {},
+      async tx(signer: Signer) {
+        await AAVEPool__factory.connect(depositTo, signer).borrow(
+          realLong!.address,
+          borrowAmount,
+          1,
+          0,
+          await signer.getAddress()
+        );
+      },
     });
   }
 
