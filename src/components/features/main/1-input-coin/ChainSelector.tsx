@@ -9,7 +9,7 @@ export const ChainSelector = () => {
   return (
     <Selection
       selected={chain.chainId}
-      setSelected={setChainId}
+      setSelected={(c) => setChainId(c.chainId)}
       items={CHAINS}
       getId={(c) => c.chainId}
       cols={2}

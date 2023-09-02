@@ -1,6 +1,7 @@
 import { ZeroAddress } from "ethers";
 import { CHAINS } from "./chains.config";
 import { TOKENS } from "./tokens.config";
+import { decodeTokenId } from "utils/tokenIdEncoder";
 
 export const getTokens = (chainId: number) => TOKENS[chainId];
 export const getStableTokens = (chainId: number) =>
@@ -9,6 +10,11 @@ export const getStableTokens = (chainId: number) =>
     .sort((a, b) => (b.symbol < a.symbol ? 1 : -1));
 export const getChain = (chainId: number) =>
   CHAINS.find((c) => c.chainId === chainId)!;
+
+export const findToken = (encodedTokenId: string) => {
+  const { chainId, address } = decodeTokenId(encodedTokenId);
+  return getTokens(chainId).find((token) => token.address === address);
+};
 
 export const findTokens = (
   chainId: number,

@@ -2,8 +2,8 @@ import { FC } from "react";
 import { cn } from "utils";
 
 interface SelectionProps<T, ID> {
-  selected: ID;
-  setSelected: (selected: ID) => void;
+  selected: ID | null;
+  setSelected: (item: T) => void;
   items: T[];
   getId: (item: T) => ID;
   Item: FC<T>;
@@ -35,10 +35,12 @@ export const Selection = <T extends {}, ID>({
         const id = getId(item);
         return (
           <div
-            onClick={() => setSelected(id)}
+            onClick={() => setSelected(item)}
             key={i}
             className={cn(
-              selected === id ? "bg-white border" : "bg-neutral-100",
+              selected === id
+                ? "bg-white border"
+                : "bg-neutral-100 hover:bg-[#FAFAFA]",
               "border-[0.5px] border-neutral-200 p-3 flex gap-3 items-center"
             )}
           >
