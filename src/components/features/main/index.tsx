@@ -4,7 +4,7 @@ import { RangeSelection } from "./3-range";
 import { Amount } from "./4-amount";
 import { TogglePanel } from "./TogglePanel";
 import { useModal } from "utils/hooks/useModal";
-import { TxModal } from "./TxModal";
+import { TxModal } from "./tx-modal";
 
 export const Main = () => {
   const [isOpen, openModal, closeModal] = useModal(false);

@@ -8,10 +8,15 @@ export enum RANGE {
   STANDARD = 1,
   WIDE = 2,
 }
+export enum HEDGE {
+  NO_HEDGE = 0,
+  STANDARD = 1,
+  STRONG = 2,
+}
 interface PositionState {
   chainId: number;
   poolRange: RANGE;
-  hedge: RANGE;
+  hedge: HEDGE;
   long: string | null;
   short: string | null;
   invest: InvestDto | null;
@@ -23,7 +28,7 @@ export const positionAtom = atom<PositionState>({
   default: {
     chainId: 1,
     poolRange: RANGE.STANDARD,
-    hedge: RANGE.STANDARD,
+    hedge: HEDGE.STANDARD,
     amount: "",
     long: null,
     short: null,
@@ -43,14 +48,14 @@ export const usePosition = () => {
   const setLong = setter<string | null>("long");
   const setInvest = setter<InvestDto>("invest");
   const setPoolRange = setter<RANGE>("poolRange");
-  const setHedge = setter<RANGE>("hedge");
+  const setHedge = setter<HEDGE>("hedge");
 
   const invest = position.invest;
   const investTokens = invest
     ? findTokens(invest.chainId, invest.inputAssets, true)
     : null;
 
-  const long = position.long
+  const realLong = position.long
     ? findToken(position.long)
     : investTokens
     ? investTokens.find((t) => t.type === "STABLE")!
@@ -58,10 +63,12 @@ export const usePosition = () => {
 
   return {
     chain: getChain(position.chainId),
-    long,
+    long: position.long ? findToken(position.long) : null,
+    realLong,
     short: investTokens
       ? investTokens.find(
-          (t) => encodeTokenId(t) === (long ? encodeTokenId(long) : null)
+          (t) =>
+            encodeTokenId(t) === (realLong ? encodeTokenId(realLong) : null)
         )!
       : null,
     longId: position.long,

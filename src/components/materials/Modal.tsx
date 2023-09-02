@@ -57,13 +57,13 @@ const Modal: FC<ModalProps> = ({
             <div onClick={onBack} className="cursor-pointer">
               <IoMdArrowBack size={22} />
             </div>
-          ): <div className="w-[22px]"/>}
-          <p className="text-h-sm">{title}</p>
-          {closable && (
-            <div onClick={closeModal} className="cursor-pointer">
-              <IoMdClose size={22} />
-            </div>
+          ) : (
+            <div className="w-[22px]" />
           )}
+          <p className="text-h-sm">{title}</p>
+          <div onClick={closeModal} className="cursor-pointer">
+            <IoMdClose size={22} />
+          </div>
         </header>
         {children}
       </div>

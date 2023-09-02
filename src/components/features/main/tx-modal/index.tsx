@@ -5,7 +5,7 @@ interface TxModalProps {
 }
 export const TxModal = ({ close }: TxModalProps) => {
   return (
-    <Modal title="Lend & Invest" closeModal={close}>
+    <Modal title="Lend & Invest" closeModal={close} closable={false}>
       <div className="py-8"></div>
     </Modal>
   );
