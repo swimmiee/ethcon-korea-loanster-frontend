@@ -1,33 +1,24 @@
-export const investCategories = ["UniswapV3", "Curve", "Lido"] as const;
-export type InvestCategory = (typeof investCategories)[number];
-
-export type InvestMeta<T extends InvestCategory> = T extends "UniswapV3"
-  ? {
-      feeTier: number;
-      tickSpacing: number;
-      toaster: string;
-      swapRouter: string;
-      factory: string;
-      masterChef?: string;
-      rewardToken?: string;
-    }
-  : T extends "Curve"
-  ? {}
-  : T extends "Lido"
-  ? {
-    type: 'stETH' | 'stMATIC'
-  }
-  : never;
-
-export interface InvestDto<T extends InvestCategory = any> {
+export interface InvestDto {
   id: string;
   name: string;
   chainId: number;
   address: string;
   project: string;
-  category: InvestCategory;
-  dynamicMeta: any;
-  meta: InvestMeta<T>;
+  category: "UniswapV3";
+  dynamicMeta: {
+    aprList: number[];
+    rangeList: [[number, number], [number, number], [number, number]];
+    tick: number;
+  };
+  meta: {
+    feeTier: number;
+    tickSpacing: number;
+    toaster: string;
+    swapRouter: string;
+    factory: string;
+    masterChef?: string;
+    rewardToken?: string;
+  };
   apr: number;
   apy: number;
   tier: number;
