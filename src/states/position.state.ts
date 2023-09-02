@@ -82,7 +82,9 @@ export const usePosition = () => {
     poolRange: position.poolRange,
     hedge: position.hedge,
     amount: position.amount,
-    isValid: position.invest,
+    isValid: Boolean(
+      position.invest && !isNaN(+position.amount) && +position.amount > 0
+    ),
     investTokens,
     setLong,
     setChainId,

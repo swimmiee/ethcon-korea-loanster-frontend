@@ -16,7 +16,7 @@ export const BalanceGauge = ({ balanceWillbe }: BalanceGaugeProps) => {
           key={i}
           className="h-full flex flex-col items-center justify-center"
           style={{
-            background: ["#FFFF00", "#ffb700", "#b7ff00"][i],
+            background: ["#ffb700", "#00ff99","#00b7ff"][i],
             flex: b.dollarValue / nextTotalBalance,
           }}
         >

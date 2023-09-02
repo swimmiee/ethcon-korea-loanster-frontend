@@ -1,3 +1,4 @@
+import { LENDING_CONFIG } from "configs/lending.config";
 import { parseUnits } from "ethers";
 import { Token } from "interfaces/token.interface";
 import { HEDGE } from "states/position.state";
@@ -11,12 +12,13 @@ const DEPOSIT_RATES = {
   [HEDGE.NEUTRAL]: 100n,
 };
 
-export const getLendAndBorrowAmount = (
+export const getLendAndBorrowInfo = (
   long: Token,
   short: Token,
   amount: string,
   hedge: HEDGE
 ) => {
+  const chainId = long.chainId;
   const longAmount = parseUnits(amount, long.decimals);
 
   // TODO
@@ -27,19 +29,22 @@ export const getLendAndBorrowAmount = (
 
   const _borrowAmount =
     (((lendAmount * BigInt(10000 * (LTV * BORROW_RATE))) / 10000n) *
-      BigInt(Math.floor(1000000 * long.priceUSD / short.priceUSD))) /
+      BigInt(Math.floor((1000000 * long.priceUSD) / short.priceUSD))) /
     100000n;
-  const borrowAmount = short.decimals >= long.decimals ?
-    _borrowAmount * parseUnits("1", short.decimals - long.decimals) :
-    _borrowAmount / parseUnits("1", long.decimals - short.decimals);
+  const borrowAmount =
+    short.decimals >= long.decimals
+      ? _borrowAmount * parseUnits("1", short.decimals - long.decimals)
+      : _borrowAmount / parseUnits("1", long.decimals - short.decimals);
 
+  const lend = LENDING_CONFIG[chainId].deposit[long.symbol];
+  const borrow = LENDING_CONFIG[chainId].borrow[short.symbol];
   return {
     // TODO
-    lendingPool: "",
-    borrowFrom: "",
-    lendingProtocol: "SPARK",
+    depositTo: lend?.depositTo ?? "",
+    borrowFrom: borrow?.borrowFrom ?? "",
+    lendingProtocol: lend?.name ?? "",
     lendAmount,
     longInputAmount: longAmount - lendAmount,
-    borrowAmount, // TODO
+    borrowAmount,
   };
 };
