@@ -19,20 +19,20 @@ export const PoolItem = ({
         <p className="text-t-xl">{tokens.map((t) => t.symbol).join("+")}</p>
       </div>
       <div className="flex items-center gap-4 mt-2">
-        <p className="text-t-lg">APR</p>
-        <p className="text-t-lg">{apr.toFixed(2)}%</p>
+        <p className="flex-1 text-center text-t-lg">APR</p>
+        <p className="flex-1 text-center text-t-lg">{apr.toFixed(2)}%</p>
       </div>
       <div className="flex items-center gap-4">
-        <p className="text-t-lg">TVL</p>
-        <p className="text-t-lg">$ {compactFormat(tvlUSD)}</p>
+        <p className="flex-1 text-center text-t-lg">TVL</p>
+        <p className="flex-1 text-center text-t-lg">$ {compactFormat(tvlUSD)}</p>
       </div>
       <div className="flex items-center gap-4">
-        <p className="text-t-lg">Volume (7D)</p>
-        <p className="text-t-lg">$ {compactFormat(volumeUSD7D)}</p>
+        <p className="flex-1 text-center text-t-lg">Volume (7D)</p>
+        <p className="flex-1 text-center text-t-lg">$ {compactFormat(volumeUSD7D)}</p>
       </div>
       <div className="flex items-center gap-4">
-        <p className="text-t-lg">Fee Tier</p>
-        <p className="text-t-lg">{meta.feeTier / 1e4}%</p>
+        <p className="flex-1 text-center text-t-lg">Fee Tier</p>
+        <p className="flex-1 text-center text-t-lg">{meta.feeTier / 1e4}%</p>
       </div>
     </div>
   );

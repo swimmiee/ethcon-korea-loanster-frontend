@@ -1,19 +1,20 @@
-import { RANGE, usePosition } from "states/position.state";
+import { HEDGE, RANGE, usePosition } from "states/position.state";
 import { Selection } from "components/materials/Selection";
 
-interface RangeItem {
-  id: RANGE;
+interface RItem<T extends RANGE | HEDGE> {
+  id: T;
   name: string;
 }
-const pooledRangeItems: RangeItem[] = [
+const pooledRangeItems: RItem<RANGE>[] = [
   { id: RANGE.SPOT, name: "Spot" },
   { id: RANGE.STANDARD, name: "Standard" },
   { id: RANGE.WIDE, name: "Wide" },
 ];
-const hedgePowerItems: RangeItem[] = [
-  { id: RANGE.SPOT, name: "No Hedge" },
-  { id: RANGE.STANDARD, name: "Standard" },
-  { id: RANGE.WIDE, name: "Strong" },
+const hedgePowerItems: RItem<HEDGE>[] = [
+  { id: HEDGE.NO_HEDGE, name: "No Hedge" },
+  { id: HEDGE.STANDARD, name: "Standard" },
+  { id: HEDGE.STRONG, name: "Strong" },
+  { id: HEDGE.NEUTRAL, name: "Neutral" },
 ];
 
 export const RangeSelection = () => {
@@ -40,7 +41,7 @@ export const RangeSelection = () => {
         setSelected={(r) => setHedge(r.id)}
         items={hedgePowerItems}
         getId={(i) => i.id}
-        cols={3}
+        cols={4}
         Item={(item) => (
           <div className="flex-1">
             <p className="text-h-sm text-center">{item.name}</p>

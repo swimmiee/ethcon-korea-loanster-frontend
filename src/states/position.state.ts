@@ -12,13 +12,13 @@ export enum HEDGE {
   NO_HEDGE = 0,
   STANDARD = 1,
   STRONG = 2,
+  NEUTRAL = 3,
 }
 interface PositionState {
   chainId: number;
   poolRange: RANGE;
   hedge: HEDGE;
   long: string | null;
-  short: string | null;
   invest: InvestDto | null;
   amount: string;
 }
@@ -31,24 +31,30 @@ export const positionAtom = atom<PositionState>({
     hedge: HEDGE.STANDARD,
     amount: "",
     long: null,
-    short: null,
     invest: null,
   },
 });
 
 export const usePosition = () => {
   const [position, setPosition] = useRecoilState(positionAtom);
-  function setter<T>(key: keyof PositionState) {
+  function setter<T>(key: keyof PositionState, toNull: ("long" | "invest")[]) {
     return (value: T) => {
-      setPosition((prev) => ({ ...prev, [key]: value }));
+      setPosition((prev) => {
+        const item: PositionState = { ...prev, [key]: value };
+        toNull.forEach((k) => {
+          item[k] = null;
+        });
+        return { ...prev, [key]: value };
+      });
     };
   }
 
-  const setChainId = setter<number>("chainId");
-  const setLong = setter<string | null>("long");
-  const setInvest = setter<InvestDto>("invest");
-  const setPoolRange = setter<RANGE>("poolRange");
-  const setHedge = setter<HEDGE>("hedge");
+  const setChainId = setter<number>("chainId", ["long", "invest"]);
+  const setLong = setter<string | null>("long", ["invest"]);
+  const setInvest = setter<InvestDto>("invest", []);
+  const setPoolRange = setter<RANGE>("poolRange", []);
+  const setHedge = setter<HEDGE>("hedge", []);
+  const setAmount = setter<string>("amount", []);
 
   const invest = position.invest;
   const investTokens = invest
@@ -68,11 +74,10 @@ export const usePosition = () => {
     short: investTokens
       ? investTokens.find(
           (t) =>
-            encodeTokenId(t) === (realLong ? encodeTokenId(realLong) : null)
+            encodeTokenId(t) !== (realLong ? encodeTokenId(realLong) : null)
         )!
       : null,
     longId: position.long,
-    shortId: position.short,
     invest: position.invest,
     poolRange: position.poolRange,
     hedge: position.hedge,
@@ -84,5 +89,6 @@ export const usePosition = () => {
     setInvest,
     setPoolRange,
     setHedge,
+    setAmount,
   };
 };
