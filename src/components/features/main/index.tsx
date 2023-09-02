@@ -1,6 +1,5 @@
 import { InputStablecoin } from "./1-input-coin";
 import { Pools } from "./2-pools";
-import { RangeSelection } from "./3-range";
 import { TogglePanel } from "./TogglePanel";
 
 export const Main = () => {
@@ -13,7 +12,7 @@ export const Main = () => {
         <Pools />
       </TogglePanel>
       <TogglePanel title="1️⃣ Range">
-        <RangeSelection />
+        <p>asdsadasdasdasdasdas</p>
       </TogglePanel>
       <TogglePanel title="1️⃣ Amount">
         <p>asdsadasdasdasdasdas</p>
