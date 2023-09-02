@@ -42,9 +42,9 @@ export const usePosition = () => {
       setPosition((prev) => {
         const item: PositionState = { ...prev, [key]: value };
         toNull.forEach((k) => {
-          item[k] = null;
+          Object.assign(item, { [k]: null })
         });
-        return { ...prev, [key]: value };
+        return item;
       });
     };
   }

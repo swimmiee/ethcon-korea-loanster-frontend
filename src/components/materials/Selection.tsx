@@ -28,6 +28,8 @@ export const Selection = <T extends {}, ID>({
           ? "grid-cols-3"
           : cols === 4
           ? "grid-cols-4"
+          : cols === 5
+          ? "grid-cols-5"
           : "grid-cols-1"
       )}
     >

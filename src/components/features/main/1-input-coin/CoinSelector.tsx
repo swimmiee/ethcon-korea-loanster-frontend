@@ -1,17 +1,20 @@
 import { Selection } from "components/materials/Selection";
 import { TokenIcon } from "components/materials/coinIcons/TokenIcon";
-import { getStableTokens } from "configs";
+import { getDepositableTokens } from "configs";
 import { usePosition } from "states/position.state";
 import { encodeTokenId } from "utils/tokenIdEncoder";
 
 export const CoinSelector = () => {
   const { chain, longId, setLong } = usePosition();
-  const stableTokens = getStableTokens(chain.chainId);
+  const depositableTokens = getDepositableTokens(chain.chainId);
   return (
     <Selection
       selected={longId}
       setSelected={({ token }) => setLong(token ? encodeTokenId(token) : null)}
-      items={[{ token: null }, ...stableTokens.map((token) => ({ token }))]}
+      items={[
+        { token: null },
+        ...depositableTokens.map((token) => ({ token })),
+      ]}
       getId={({ token }) => (token ? encodeTokenId(token) : null)}
       Item={(item) =>
         item.token ? (
@@ -23,7 +26,7 @@ export const CoinSelector = () => {
           <p className="flex-1 text-h-sm text-center">Any Token</p>
         )
       }
-      cols={4}
+      cols={depositableTokens.length + 1}
     />
   );
 };
