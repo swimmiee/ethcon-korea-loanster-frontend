@@ -3,6 +3,8 @@ import { Selection } from "components/materials/Selection";
 import { findLendingProtocol } from "streams/findLendingProtocol";
 import { RangeGraph } from "./RangeGraph";
 import { BORROW_RATE, DEPOSIT_RATES } from "streams/getLendAndBorrowInfo";
+import { BaseCoinIcon } from "components/materials/coinIcons/BaseCoinIcon";
+import { LENDING_PROTOCOL_LOGO } from "configs/lending.config";
 
 interface RItem<T extends RANGE | HEDGE> {
   id: T;
@@ -33,6 +35,8 @@ export const RangeSelection = () => {
   const mul = 1 - ((1 - lb) * derate) / (1 + lb);
   const expectedApr = (invest?.dynamicMeta?.aprList[poolRange] ?? 0) * mul;
 
+  const strategy = realLong?.symbol === "ETH" ? "Leverage" : "Hedge";
+
   return (
     <div>
       <p className="text-t-lg mb-2">Select pooled range</p>
@@ -49,7 +53,9 @@ export const RangeSelection = () => {
           </div>
         )}
       />
-      <p className="text-t-lg mt-4 mb-2">Select hedge rate</p>
+      <p className="text-t-lg mt-4 mb-2">
+        Select {strategy.toLowerCase()} rate
+      </p>
       {lendingProtocol ? (
         <Selection
           selected={hedge}
@@ -73,9 +79,23 @@ export const RangeSelection = () => {
         </div>
       )}
 
-      <div className="mt-6 flex justify-center gap-2">
-        <p className="text-h-sm text-center"> Expected APR: </p>
-        <p className="text-h-sm text-center">{expectedApr.toFixed(2)}%</p>
+      <div className="mt-6 flex items-center justify-evenly gap-2">
+        <p className="text-h-sm text-center">
+          Expected APR: {expectedApr.toFixed(2)}%
+        </p>
+        {lendingProtocol && (
+          <div className="flex gap-2 items-center">
+            <p className="text-h-sm text-center">
+              {realLong?.symbol === "ETH" ? "Leverage" : "Hedge"} with&nbsp;
+              {lendingProtocol.name} Protocol
+            </p>
+            <BaseCoinIcon
+              size="xl"
+              imgSrc={LENDING_PROTOCOL_LOGO[lendingProtocol.name]}
+              alt={lendingProtocol.name}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

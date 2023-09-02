@@ -1,6 +1,6 @@
 import { Chain } from "interfaces/chain.interface";
 
-const SUPPORTED_CHAINS = [1, 10, 137, 42161, 59144, 1101];
+const SUPPORTED_CHAINS = [1, 10, 137, 59144, 1101, 167005];
 
 export const CHAINS: Chain[] = [
   {
@@ -79,4 +79,14 @@ export const CHAINS: Chain[] = [
     rpcUrls: ["https://arb1.arbitrum.io/rpc"],
     explorer: "https://arbiscan.io/",
   },
+  {
+    chainId: 167005,
+    logoURI:
+      "https://user-images.githubusercontent.com/13951458/230506906-474e42f7-00e8-478b-9edc-c127ed97f83e.svg",
+    name: "Taiko (testnet)",
+    symbol: "ETH",
+    multicallAddress: "0xcA11bde05977b3631167028862bE2a173976CA11",
+    rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+    explorer: "https://arbiscan.io/",
+  }
 ].filter((c) => SUPPORTED_CHAINS.includes(c.chainId));
