@@ -1,4 +1,4 @@
-import { MainPage } from "components/pages/Main";
+import { MainPage } from "pages/Main";
 import { useSyncAccount } from "states/account.state";
 
 function App() {
