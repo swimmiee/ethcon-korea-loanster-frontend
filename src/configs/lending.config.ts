@@ -22,6 +22,7 @@ export const LENDING_CONFIG: Record<number, LendingConfig<any>[]> = {
       core: "0xC13e21B648A5Ee794902342038FF3aDAB66BE987",
       depositTokens: [
         { symbol: "ETH", ltv: 0.8 }, // TODO
+        { symbol: "DAI", ltv: 0.8 }, // TODO
       ],
       borrowToken: ["DAI", "ETH", "wstETH"],
     },
